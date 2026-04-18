@@ -31,3 +31,9 @@ Step 6 — Run the Server
 python manage.py runserver
 
 Then open the browser and go to http://127.0.0.1:8000
+
+Versions of everything: 
+asgiref==3.11.1
+Django==6.0.4
+sqlparse==0.5.5
+tzdata==2026.1
