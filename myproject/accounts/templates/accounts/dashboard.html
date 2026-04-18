@@ -1,82 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Finance Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VaqueroSaver</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
-    header { background: #007bff; color: white; padding: 20px 30px; text-align: center; }
-    header h1 { margin: 0; font-size: 28px; }
-    header p { margin: 5px 0 0; font-size: 14px; }
-    .navbar { background: #0056b3; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .navbar span { color: white; font-size: 14px; }
-    .navbar a { color: white; text-decoration: none; font-size: 14px; }
-    .input-section, .transactions { background: white; margin: 20px auto; padding: 20px 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 600px; }
-    .input-section h2, .transactions h2 { margin-top: 0; }
-    input, select { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 8px; }
-    button:hover { background: #0056b3; }
-    .summary { display: flex; justify-content: center; gap: 20px; margin: 20px auto; max-width: 600px; }
-    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; flex: 1; }
-    .card h3 { margin: 0 0 10px; font-size: 14px; color: #666; }
-    .card p { margin: 0; font-size: 24px; font-weight: bold; color: #333; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    ul li { padding: 10px 0; border-bottom: 1px solid #eee; color: #555; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f4f6f8; color: #333; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+
+    /* Topbar */
+    .topbar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 14px 0; }
+    .topbar__inner { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+    .brand__logo { background: #007bff; color: white; font-weight: bold; padding: 6px 10px; border-radius: 6px; }
+    .brand__name { font-weight: bold; font-size: 18px; color: #333; }
+    .nav { display: flex; gap: 20px; }
+    .nav a { text-decoration: none; color: #555; font-size: 14px; }
+    .nav a:hover { color: #007bff; }
+    .topbar__actions { display: flex; gap: 10px; align-items: center; }
+    .topbar__user { font-size: 14px; color: #555; }
+
+    /* Buttons */
+    .btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
+    .btn--primary { background: #007bff; color: white; }
+    .btn--primary:hover { background: #0056b3; }
+    .btn--ghost { background: transparent; border: 1px solid #ccc; color: #333; }
+    .btn--ghost:hover { background: #f0f0f0; }
+    .btn--full { width: 100%; margin-top: 16px; text-align: center; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, #007bff, #0056b3); color: white; padding: 60px 0; }
+    .hero__inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+    .hero__copy { flex: 1; }
+    .hero__copy h1 { font-size: 36px; margin-bottom: 16px; }
+    .hero__copy p { font-size: 16px; margin-bottom: 24px; opacity: 0.9; }
+    .hero__cta { display: flex; gap: 12px; margin-bottom: 20px; }
+    .hero__badges { display: flex; gap: 10px; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 13px; }
+    .hero__card { flex: 0 0 280px; }
+
+    /* Mini card */
+    .mini { background: white; border-radius: 12px; padding: 20px; color: #333; }
+    .mini__row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .mini__label { font-size: 12px; color: #888; }
+    .mini__value { font-size: 18px; font-weight: bold; }
+    .mini__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .mini__box { background: #f4f6f8; border-radius: 8px; padding: 10px; text-align: center; }
+    .pill--ok { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 12px; }
+
+    /* Sections */
+    .section { padding: 50px 0; }
+    .section__head { text-align: center; margin-bottom: 30px; }
+    .section__head h2 { font-size: 26px; margin-bottom: 8px; }
+    .section__head p { color: #666; }
+
+    /* Grid */
+    .grid { display: grid; gap: 20px; }
+    .grid--3 { grid-template-columns: repeat(3, 1fr); }
+    .grid--2 { grid-template-columns: repeat(2, 1fr); }
+    .mt-16 { margin-top: 16px; }
+
+    /* Cards */
+    .card { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .card h3 { margin-bottom: 10px; font-size: 16px; }
+    .card p { color: #666; font-size: 14px; }
+
+    /* Stats */
+    .stat { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); text-align: center; }
+    .stat--balance { border-top: 4px solid #007bff; }
+    .stat__label { font-size: 13px; color: #888; margin-bottom: 8px; }
+    .stat__value { font-size: 32px; font-weight: bold; color: #333; }
+    .stat__hint { font-size: 12px; color: #aaa; margin-top: 6px; }
+
+    /* Panel */
+    .panel { background: white; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .panel__head { margin-bottom: 20px; }
+    .panel__head h3 { font-size: 18px; margin-bottom: 4px; }
+    .panel__head p { color: #666; font-size: 13px; }
+
+    /* Form */
+    .form { display: flex; flex-direction: column; gap: 14px; }
+    .form__row { display: flex; flex-direction: column; gap: 6px; }
+    .form__row--2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #555; }
+    .field input, .field select { padding: 9px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; width: 100%; }
+    .form__actions { display: flex; gap: 10px; margin-top: 4px; }
+
+    /* Tips */
+    .tips { display: flex; flex-direction: column; gap: 14px; }
+    .tip { background: #f4f6f8; border-radius: 8px; padding: 12px; }
+    .tip__title { font-weight: bold; font-size: 14px; margin-bottom: 4px; }
+    .tip__text { font-size: 13px; color: #666; }
+    .divider { border-top: 1px solid #eee; margin: 16px 0; }
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson { display: flex; justify-content: space-between; text-decoration: none; color: #333; padding: 10px; border-radius: 6px; background: #f4f6f8; font-size: 14px; }
+    .lesson:hover { background: #e8ecf0; }
+    .lesson__meta { color: #888; font-size: 12px; }
+
+    /* Budget */
+    .budget-rows { display: flex; flex-direction: column; gap: 14px; }
+    .budget-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #f4f6f8; border-radius: 8px; }
+    .budget-row__title { font-weight: bold; font-size: 14px; }
+    .budget-row__desc { font-size: 12px; color: #888; }
+    .budget-row__right { display: flex; align-items: center; gap: 10px; }
+    .chip { background: #007bff; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+    .money { font-weight: bold; font-size: 16px; }
+
+    /* Goals */
+    .goals { display: flex; flex-direction: column; gap: 16px; margin-bottom: 10px; }
+    .goal__title { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+    .goal__meta { font-size: 12px; color: #888; margin-top: 4px; }
+    .progress { background: #e0e0e0; border-radius: 10px; height: 8px; }
+    .progress__bar { background: #007bff; height: 8px; border-radius: 10px; }
+
+    /* Table */
+    .table { width: 100%; }
+    .table__head, .table__row { display: grid; grid-template-columns: 120px 1fr 120px 100px; gap: 10px; padding: 12px 0; font-size: 14px; }
+    .table__head { font-weight: bold; border-bottom: 2px solid #eee; color: #555; }
+    .table__row { border-bottom: 1px solid #f0f0f0; }
+    .right { text-align: right; }
+    .muted { color: #aaa; }
+
+    /* Footer */
+    .footer { background: #fff; border-top: 1px solid #e0e0e0; padding: 20px 0; margin-top: 40px; }
+    .footer__inner { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    .footer__links { display: flex; gap: 16px; }
+    .footer__links a { text-decoration: none; color: #555; }
+
+    .income-row .right { color: #28a745; }
+    .expense-row .right { color: #dc3545; }
   </style>
 </head>
-<body>
 
-  <header>
-    <h1>💰 Finance Tracker</h1>
-    <p>Track your income, expenses, and savings</p>
+<body>
+  <!-- Top Nav -->
+  <header class="topbar">
+    <div class="container topbar__inner">
+      <a class="brand" href="#">
+        <span class="brand__logo">MW</span>
+        <span class="brand__name">VaqueroSaver</span>
+      </a>
+
+      <nav class="nav">
+        <a href="#dashboard">Dashboard</a>
+        <a href="#budget">Budget</a>
+        <a href="#learn">Learn</a>
+        <a href="#transactions">Transactions</a>
+      </nav>
+
+      <div class="topbar__actions">
+        <span class="topbar__user">Welcome, {{ request.user.username }}</span>
+        <a class="btn btn--ghost" href="/logout/">Logout</a>
+      </div>
+    </div>
   </header>
 
-  <div class="navbar">
-    <span>Welcome, {{ request.user.username }}</span>
-    <a href="/logout/">Logout</a>
-  </div>
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__copy">
+          <h1>Take control of your money.</h1>
+          <p>Track income and expenses, build a simple budget, and learn habits that make your money go further.</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="#dashboard">Open dashboard</a>
+            <a class="btn btn--ghost" href="#learn">Start learning</a>
+          </div>
+          <div class="hero__badges">
+            <span class="badge">Allowance-friendly</span>
+            <span class="badge">Paycheck-ready</span>
+            <span class="badge">Simple goals</span>
+          </div>
+        </div>
 
-  <section class="input-section">
-    <h2>Add Transaction</h2>
-    <form method="post">
-      {% csrf_token %}
-      <input type="text" name="description" placeholder="Description (e.g. Food, Job)" required>
-      <input type="number" name="amount" placeholder="Amount" step="0.01" required>
-      <select name="type">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-      <button type="submit">Add</button>
-    </form>
-  </section>
+        <div class="hero__card">
+          <div class="mini">
+            <div class="mini__row">
+              <div>
+                <div class="mini__label">This month</div>
+                <div class="mini__value">${{ balance }} planned</div>
+              </div>
+              <div class="pill pill--ok">On track</div>
+            </div>
+            <div class="mini__grid">
+              <div class="mini__box">
+                <div class="mini__label">Income</div>
+                <div class="mini__value">${{ total_income }}</div>
+              </div>
+              <div class="mini__box">
+                <div class="mini__label">Expenses</div>
+                <div class="mini__value">${{ total_expenses }}</div>
+              </div>
+              <div class="mini__box">
+                <div class="mini__label">Savings</div>
+                <div class="mini__value">${{ balance }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <section class="summary">
-    <div class="card">
-      <h3>Balance</h3>
-      <p>${{ balance }}</p>
-    </div>
-    <div class="card">
-      <h3>Income</h3>
-      <p>${{ total_income }}</p>
-    </div>
-    <div class="card">
-      <h3>Expenses</h3>
-      <p>${{ total_expenses }}</p>
-    </div>
-  </section>
+    <!-- Feature Cards -->
+    <section class="section">
+      <div class="container">
+        <div class="section__head">
+          <h2>Everything you need to start</h2>
+          <p>Clean, simple tools that grow with you.</p>
+        </div>
+        <div class="grid grid--3">
+          <article class="card">
+            <h3>Track transactions</h3>
+            <p>Add income and expenses in seconds and see where money goes.</p>
+          </article>
+          <article class="card">
+            <h3>Budget breakdown</h3>
+            <p>Plan your needs, wants, and savings with clear totals.</p>
+          </article>
+          <article class="card">
+            <h3>Learn as you go</h3>
+            <p>Short lessons and tips you can apply immediately.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-  <section class="transactions">
-    <h2>Transactions</h2>
-    <ul>
-      {% if transactions %}
-        {% for t in transactions %}
-          <li>{{ t.description }} — ${{ t.amount }} ({{ t.type }})</li>
-        {% endfor %}
-      {% else %}
-        <li>No transactions yet</li>
-      {% endif %}
-    </ul>
-  </section>
+    <!-- Dashboard Summary -->
+    <section class="section" id="dashboard">
+      <div class="container">
+        <div class="section__head">
+          <h2>Dashboard</h2>
+          <p>A quick snapshot of your money this period.</p>
+        </div>
 
+        <div class="grid grid--3">
+          <div class="stat stat--balance">
+            <div class="stat__label">Balance</div>
+            <div class="stat__value">${{ balance }}</div>
+            <div class="stat__hint">Income − Expenses</div>
+          </div>
+          <div class="stat">
+            <div class="stat__label">Income</div>
+            <div class="stat__value">${{ total_income }}</div>
+            <div class="stat__hint">All deposits</div>
+          </div>
+          <div class="stat">
+            <div class="stat__label">Expenses</div>
+            <div class="stat__value">${{ total_expenses }}</div>
+            <div class="stat__hint">All spending</div>
+          </div>
+        </div>
+
+        <div class="grid grid--2 mt-16">
+          <!-- Add Transaction -->
+          <section class="panel">
+            <div class="panel__head">
+              <h3>Add transaction</h3>
+              <p>Log income or spending to update your totals.</p>
+            </div>
+            <form class="form" method="post">
+              {% csrf_token %}
+              <div class="form__row">
+                <label class="field">
+                  <span>Description</span>
+                  <input type="text" name="description" placeholder="e.g. Paycheck, Groceries, Gas" required />
+                </label>
+              </div>
+              <div class="form__row form__row--2">
+                <label class="field">
+                  <span>Amount</span>
+                  <input type="number" name="amount" placeholder="0.00" step="0.01" required />
+                </label>
+                <label class="field">
+                  <span>Type</span>
+                  <select name="type">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                  </select>
+                </label>
+              </div>
+              <div class="form__row form__row--2">
+                <label class="field">
+                  <span>Category</span>
+                  <select name="category">
+                    <option>Needs</option>
+                    <option>Wants</option>
+                    <option>Savings</option>
+                    <option>Debt</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Date</span>
+                  <input type="date" name="date" required />
+                </label>
+              </div>
+              <div class="form__actions">
+                <button class="btn btn--primary" type="submit">Add transaction</button>
+                <button class="btn btn--ghost" type="reset">Clear</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Tips / Learn -->
+          <aside class="panel" id="learn">
+            <div class="panel__head">
+              <h3>Learning tip</h3>
+              <p>Small habits make big differences.</p>
+            </div>
+            <div class="tips">
+              <div class="tip">
+                <div class="tip__title">Try the 50/30/20 rule</div>
+                <div class="tip__text">Needs 50%, Wants 30%, Savings 20%.</div>
+              </div>
+              <div class="tip">
+                <div class="tip__title">Pay yourself first</div>
+                <div class="tip__text">Move savings out right after you get paid.</div>
+              </div>
+              <div class="tip">
+                <div class="tip__title">Make "subscriptions" visible</div>
+                <div class="tip__text">List them all. Cancel anything unused.</div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="lesson-list">
+              <a href="#" class="lesson">
+                <div class="lesson__title">Budgeting basics</div>
+                <div class="lesson__meta">5 min</div>
+              </a>
+              <a href="#" class="lesson">
+                <div class="lesson__title">Needs vs wants</div>
+                <div class="lesson__meta">4 min</div>
+              </a>
+              <a href="#" class="lesson">
+                <div class="lesson__title">Emergency funds</div>
+                <div class="lesson__meta">6 min</div>
+              </a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Budget Section -->
+    <section class="section" id="budget">
+      <div class="container">
+        <div class="section__head">
+          <h2>Budget plan</h2>
+          <p>Plan your money before you spend it.</p>
+        </div>
+        <div class="grid grid--2">
+          <section class="panel">
+            <div class="panel__head">
+              <h3>Budget breakdown</h3>
+              <p>Set target amounts by category.</p>
+            </div>
+            <div class="budget-rows">
+              <div class="budget-row">
+                <div class="budget-row__left">
+                  <div class="budget-row__title">Needs</div>
+                  <div class="budget-row__desc">Rent, food, bills, transport</div>
+                </div>
+                <div class="budget-row__right">
+                  <span class="chip">50%</span>
+                  <span class="money">${{ needs_total }}</span>
+                </div>
+              </div>
+              <div class="budget-row">
+                <div class="budget-row__left">
+                  <div class="budget-row__title">Wants</div>
+                  <div class="budget-row__desc">Fun, eating out, hobbies</div>
+                </div>
+                <div class="budget-row__right">
+                  <span class="chip">30%</span>
+                  <span class="money">${{ wants_total }}</span>
+                </div>
+              </div>
+              <div class="budget-row">
+                <div class="budget-row__left">
+                  <div class="budget-row__title">Savings</div>
+                  <div class="budget-row__desc">Emergency fund, goals</div>
+                </div>
+                <div class="budget-row__right">
+                  <span class="chip">20%</span>
+                  <span class="money">${{ savings_total }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="panel">
+            <div class="panel__head">
+              <h3>Goals</h3>
+              <p>Pick one goal to focus on first.</p>
+            </div>
+            <div class="goals">
+              <div class="goal">
+                <div class="goal__title">Emergency fund</div>
+                <div class="progress">
+                  <div class="progress__bar" style="width: 0%"></div>
+                </div>
+                <div class="goal__meta">$0 of $500</div>
+              </div>
+              <div class="goal">
+                <div class="goal__title">New laptop</div>
+                <div class="progress">
+                  <div class="progress__bar" style="width: 0%"></div>
+                </div>
+                <div class="goal__meta">$0 of $900</div>
+              </div>
+            </div>
+            <button class="btn btn--primary btn--full" type="button">Add a goal</button>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- Transactions -->
+    <section class="section" id="transactions">
+      <div class="container">
+        <div class="section__head">
+          <h2>Transactions</h2>
+          <p>Your recent activity will show here.</p>
+        </div>
+        <div class="panel">
+          <div class="table">
+            <div class="table__head">
+              <div>Date</div>
+              <div>Description</div>
+              <div>Category</div>
+              <div class="right">Amount</div>
+            </div>
+            {% if transactions %}
+              {% for t in transactions %}
+                <div class="table__row {% if t.type == 'income' %}income-row{% else %}expense-row{% endif %}">
+                  <div>{{ t.date }}</div>
+                  <div>{{ t.description }}</div>
+                  <div>{{ t.category }}</div>
+                  <div class="right">
+                    {% if t.type == 'expense' %}-{% endif %}${{ t.amount }}
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="table__row">
+                <div class="muted">—</div>
+                <div class="muted">No transactions yet</div>
+                <div class="muted">—</div>
+                <div class="right muted">$0</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="muted">© <span id="year"></span> VaqueroSaver</div>
+        <div class="footer__links">
+          <a href="#learn">Learn</a>
+          <a href="#budget">Budget</a>
+          <a href="#transactions">Transactions</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
