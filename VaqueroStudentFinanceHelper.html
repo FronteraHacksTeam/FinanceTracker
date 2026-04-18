@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vaquero Student Finance Helper</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --orange: #BA7517;
+      --orange-light: #FAEEDA;
+      --orange-mid: #EF9F27;
+      --orange-dark: #633806;
+      --grey-light: #F1EFE8;
+      --grey-mid: #888780;
+      --grey-dark: #444441;
+    }
+    body { font-family: system-ui, sans-serif; color: #2C2C2A; background: #fff; }
+
+    /* Accent bar */
+    .accent-bar { height: 3px; background: #EF9F27; width: 100%; }
+
+    /* Topbar */
+    .topbar { background: #633806; padding: 0 1.5rem; height: 54px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-logo { background: #EF9F27; color: #412402; border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .brand-name { color: #FAEEDA; font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+    .brand-sub { color: #EF9F27; font-size: 11px; margin-top: 1px; }
+    .nav { display: flex; gap: 20px; }
+    .nav a { font-size: 13px; color: #FAC775; text-decoration: none; }
+    .nav a:hover { color: #FAEEDA; }
+    .topbar-actions { display: flex; gap: 8px; }
+
+    /* Buttons */
+    .btn { font-size: 13px; padding: 6px 14px; border-radius: 8px; cursor: pointer; border: 1px solid #EF9F27; background: transparent; color: #FAEEDA; }
+    .btn-primary { background: #EF9F27; color: #412402; border-color: #EF9F27; font-weight: 600; }
+    .btn-primary:hover { background: #BA7517; border-color: #BA7517; }
+    .btn:hover { background: rgba(239,159,39,0.15); }
+    .btn-dark { background: #BA7517; color: #FAEEDA; border-color: #BA7517; }
+    .btn-dark:hover { background: #633806; border-color: #633806; }
+    .btn-outline { background: transparent; color: #633806; border-color: #BA7517; }
+    .btn-outline:hover { background: #FAEEDA; }
+    .btn-full { width: 100%; margin-top: 8px; }
+
+    /* Hero */
+    .hero { padding: 2.5rem 1.5rem; border-bottom: 1px solid #EF9F27; display: flex; gap: 2rem; align-items: flex-start; background: #FAEEDA; }
+    .hero-copy { flex: 1; }
+    .hero-copy h1 { font-size: 28px; font-weight: 700; color: #412402; margin-bottom: 10px; }
+    .hero-copy p { font-size: 14px; color: #633806; line-height: 1.6; margin-bottom: 18px; }
+    .hero-cta { display: flex; gap: 8px; margin-bottom: 18px; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #EF9F27; color: #412402; font-weight: 600; }
+
+    /* Mini card in hero */
+    .mini-card { background: #fff; border: 1px solid #EF9F27; border-radius: 12px; padding: 1rem 1.25rem; width: 240px; flex-shrink: 0; }
+    .mini-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .mini-label { font-size: 11px; color: #888780; margin-bottom: 2px; }
+    .mini-value { font-size: 15px; font-weight: 600; color: #412402; }
+    .pill { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #FAEEDA; color: #633806; border: 1px solid #EF9F27; }
+    .mini-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .mini-box { background: #F1EFE8; border-radius: 8px; padding: 8px; }
+    .mini-box .mini-value { font-size: 13px; }
+
+    /* Sections */
+    .section { padding: 2rem 1.5rem; border-bottom: 1px solid #E8E6DF; }
+    .section-head { margin-bottom: 1.25rem; }
+    .section-head h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; color: #2C2C2A; }
+    .section-head p { font-size: 13px; color: #5F5E5A; }
+
+    /* Grids */
+    .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+
+    /* Feature cards */
+    .feat-card { background: #fff; border: 1px solid #E8E6DF; border-top: 3px solid #EF9F27; border-radius: 12px; padding: 1rem 1.25rem; }
+    .feat-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: #2C2C2A; }
+    .feat-card p { font-size: 13px; color: #5F5E5A; line-height: 1.5; }
+
+    /* Stat cards */
+    .stat { background: #F1EFE8; border-radius: 8px; padding: 1rem; }
+    .stat-label { font-size: 12px; color: #5F5E5A; margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 600; margin-bottom: 2px; color: #2C2C2A; }
+    .stat-hint { font-size: 11px; color: #888780; }
+    .stat-balance .stat-value { color: #BA7517; }
+
+    /* Panels */
+    .panel { background: #fff; border: 1px solid #E8E6DF; border-radius: 12px; padding: 1rem 1.25rem; }
+    .panel-head { margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 1px solid #E8E6DF; }
+    .panel-head h3 { font-size: 15px; font-weight: 600; margin-bottom: 3px; color: #2C2C2A; }
+    .panel-head p { font-size: 12px; color: #888780; }
+
+    /* Form */
+    .form-row { margin-bottom: 10px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .field { display: block; }
+    .field span { display: block; font-size: 12px; color: #5F5E5A; margin-bottom: 4px; }
+    .field input, .field select {
+      width: 100%; font-size: 13px; padding: 7px 10px;
+      border: 1px solid #D3D1C7; border-radius: 8px;
+      background: #fff; color: #2C2C2A; outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: #EF9F27; box-shadow: 0 0 0 2px rgba(239,159,39,0.2); }
+    .form-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+    /* Tips */
+    .tips { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .tip { background: #FAEEDA; border-radius: 8px; padding: 8px 10px; border-left: 3px solid #EF9F27; border-radius: 0 8px 8px 0; }
+    .tip-title { font-size: 13px; font-weight: 600; color: #633806; margin-bottom: 2px; }
+    .tip-text { font-size: 12px; color: #854F0B; }
+    .divider { border-top: 1px solid #E8E6DF; margin: 12px 0; }
+    .lesson-list { display: flex; flex-direction: column; }
+    .lesson { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #E8E6DF; text-decoration: none; color: #2C2C2A; }
+    .lesson:last-child { border-bottom: none; }
+    .lesson:hover .lesson-title { color: #BA7517; }
+    .lesson-title { font-size: 13px; }
+    .lesson-meta { font-size: 12px; color: #888780; }
+
+    /* Budget */
+    .budget-rows { display: flex; flex-direction: column; }
+    .budget-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #E8E6DF; }
+    .budget-row:last-child { border-bottom: none; }
+    .budget-row-title { font-size: 13px; font-weight: 600; color: #2C2C2A; }
+    .budget-row-desc { font-size: 12px; color: #888780; }
+    .budget-row-right { display: flex; align-items: center; gap: 8px; }
+    .chip { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #FAEEDA; color: #854F0B; border: 1px solid #EF9F27; }
+    .money { font-size: 14px; font-weight: 600; color: #2C2C2A; }
+
+    /* Goals */
+    .goal { margin-bottom: 14px; }
+    .goal-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #2C2C2A; }
+    .progress { height: 6px; background: #D3D1C7; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+    .progress-bar { height: 100%; background: #EF9F27; border-radius: 3px; transition: width 0.3s; }
+    .goal-meta { font-size: 12px; color: #888780; }
+
+    /* Transactions table */
+    .table { border-radius: 8px; overflow: hidden; }
+    .table-head { display: grid; grid-template-columns: 110px 1fr 110px 100px; gap: 8px; padding: 8px 12px; font-size: 12px; color: #5F5E5A; font-weight: 600; background: #F1EFE8; border-bottom: 1px solid #E8E6DF; }
+    .table-row { display: grid; grid-template-columns: 110px 1fr 110px 100px; gap: 8px; padding: 9px 12px; font-size: 13px; border-bottom: 1px solid #E8E6DF; }
+    .table-row:last-child { border-bottom: none; }
+    .table-row:hover { background: #FAEEDA; }
+    .right { text-align: right; }
+    .muted { color: #888780; }
+    .income-amt { color: #3B6D11; font-weight: 600; }
+    .expense-amt { color: #A32D2D; }
+
+    /* Footer */
+    .footer { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; background: #F1EFE8; border-top: 1px solid #D3D1C7; }
+    .footer-links a { font-size: 13px; color: #5F5E5A; text-decoration: none; margin-left: 16px; }
+    .footer-links a:hover { color: #BA7517; }
+    .footer-copy { font-size: 13px; color: #888780; }
+  </style>
+</head>
+<body>
+
+  <div class="accent-bar"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">VS</div>
+      <div>
+        <div class="brand-name">Vaquero</div>
+        <div class="brand-sub">Student Finance Helper</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#dashboard">Dashboard</a>
+      <a href="#budget">Budget</a>
+      <a href="#learn">Learn</a>
+      <a href="#transactions">Transactions</a>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn" type="button">Sign in</button>
+      <button class="btn btn-primary" type="button">Create account</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Take control of your money.</h1>
+        <p>
+          Track income and expenses, build a simple budget, and learn habits that
+          make your money go further.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-dark" href="#dashboard">Open dashboard</a>
+          <a class="btn btn-outline" href="#learn">Start learning</a>
+        </div>
+        <div class="badges">
+          <span class="badge">Allowance-friendly</span>
+          <span class="badge">Paycheck-ready</span>
+          <span class="badge">Simple goals</span>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-row">
+          <div>
+            <div class="mini-label">This month</div>
+            <div class="mini-value">{{ balance }} planned</div>
+          </div>
+          <div class="pill">On track</div>
+        </div>
+        <div class="mini-grid">
+          <div class="mini-box">
+            <div class="mini-label">Income</div>
+            <div class="mini-value">{{ income }}</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-label">Expenses</div>
+            <div class="mini-value">{{ expenses }}</div>
+          </div>
+          <div class="mini-box">
+            <div class="mini-label">Savings</div>
+            <div class="mini-value">$0.00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section">
+      <div class="section-head">
+        <h2>Everything you need to start</h2>
+        <p>Clean, simple tools that grow with you.</p>
+      </div>
+      <div class="grid3">
+        <article class="feat-card">
+          <h3>Track transactions</h3>
+          <p>Add income and expenses in seconds and see where money goes.</p>
+        </article>
+        <article class="feat-card">
+          <h3>Budget breakdown</h3>
+          <p>Plan your needs, wants, and savings with clear totals.</p>
+        </article>
+        <article class="feat-card">
+          <h3>Learn as you go</h3>
+          <p>Short lessons and tips you can apply immediately.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Dashboard -->
+    <section class="section" id="dashboard">
+      <div class="section-head">
+        <h2>Dashboard</h2>
+        <p>A quick snapshot of your money this period.</p>
+      </div>
+      <div class="grid3">
+        <div class="stat stat-balance">
+          <div class="stat-label">Balance</div>
+          <div class="stat-value">{{ balance }}</div>
+          <div class="stat-hint">Income − Expenses</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Income</div>
+          <div class="stat-value">{{ income }}</div>
+          <div class="stat-hint">All deposits</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Expenses</div>
+          <div class="stat-value">{{ expenses }}</div>
+          <div class="stat-hint">All spending</div>
+        </div>
+      </div>
+
+      <div class="grid2 mt-16">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Add transaction</h3>
+            <p>Log income or spending to update your totals.</p>
+          </div>
+          <form class="form" method="post" action="{{ url_for('add_transaction') }}">
+            <div class="form-row">
+              <label class="field">
+                <span>Description</span>
+                <input name="description" type="text" placeholder="e.g. Paycheck, Groceries, Gas" required />
+              </label>
+            </div>
+            <div class="form-row-2">
+              <label class="field">
+                <span>Amount</span>
+                <input name="amount" type="number" step="0.01" placeholder="0.00" required />
+              </label>
+              <label class="field">
+                <span>Type</span>
+                <select name="tx_type">
+                  <option value="income">Income</option>
+                  <option value="expense" selected>Expense</option>
+                </select>
+              </label>
+            </div>
+            <div class="form-row-2">
+              <label class="field">
+                <span>Category</span>
+                <select name="category">
+                  <option>Needs</option>
+                  <option>Wants</option>
+                  <option>Savings</option>
+                  <option>Debt</option>
+                  <option selected>Other</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Date</span>
+                <input name="tx_date" type="date" value="{{ today }}" />
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-dark" type="submit">Add transaction</button>
+              <button class="btn btn-outline" type="reset">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <aside class="panel" id="learn">
+          <div class="panel-head">
+            <h3>Learning tip</h3>
+            <p>Small habits make big differences.</p>
+          </div>
+          <div class="tips">
+            <div class="tip">
+              <div class="tip-title">Try the 50/30/20 rule</div>
+              <div class="tip-text">Needs 50%, Wants 30%, Savings 20%.</div>
+            </div>
+            <div class="tip">
+              <div class="tip-title">Pay yourself first</div>
+              <div class="tip-text">Move savings out right after you get paid.</div>
+            </div>
+            <div class="tip">
+              <div class="tip-title">Make "subscriptions" visible</div>
+              <div class="tip-text">List them all. Cancel anything unused.</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="lesson-list">
+            <a href="#" class="lesson">
+              <div class="lesson-title">Budgeting basics</div>
+              <div class="lesson-meta">5 min</div>
+            </a>
+            <a href="#" class="lesson">
+              <div class="lesson-title">Needs vs wants</div>
+              <div class="lesson-meta">4 min</div>
+            </a>
+            <a href="#" class="lesson">
+              <div class="lesson-title">Emergency funds</div>
+              <div class="lesson-meta">6 min</div>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Budget -->
+    <section class="section" id="budget">
+      <div class="section-head">
+        <h2>Budget plan</h2>
+        <p>Plan your money before you spend it.</p>
+      </div>
+      <div class="grid2">
+        <section class="panel">
+          <div class="panel-head">
+            <h3>Budget breakdown</h3>
+            <p>Set target amounts by category.</p>
+          </div>
+          <div class="budget-rows">
+            <div class="budget-row">
+              <div>
+                <div class="budget-row-title">Needs</div>
+                <div class="budget-row-desc">Rent, food, bills, transport</div>
+              </div>
+              <div class="budget-row-right">
+                <span class="chip">50%</span>
+                <span class="money">$0</span>
+              </div>
+            </div>
+            <div class="budget-row">
+              <div>
+                <div class="budget-row-title">Wants</div>
+                <div class="budget-row-desc">Fun, eating out, hobbies</div>
+              </div>
+              <div class="budget-row-right">
+                <span class="chip">30%</span>
+                <span class="money">$0</span>
+              </div>
+            </div>
+            <div class="budget-row">
+              <div>
+                <div class="budget-row-title">Savings</div>
+                <div class="budget-row-desc">Emergency fund, goals</div>
+              </div>
+              <div class="budget-row-right">
+                <span class="chip">20%</span>
+                <span class="money">$0</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <div class="panel-head">
+            <h3>Goals</h3>
+            <p>Pick one goal to focus on first.</p>
+          </div>
+          <div class="goals">
+            <div class="goal">
+              <div class="goal-title">Emergency fund</div>
+              <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+              </div>
+              <div class="goal-meta">$0 of $500</div>
+            </div>
+            <div class="goal">
+              <div class="goal-title">New laptop</div>
+              <div class="progress">
+                <div class="progress-bar" style="width: 0%"></div>
+              </div>
+              <div class="goal-meta">$0 of $900</div>
+            </div>
+          </div>
+          <button class="btn btn-dark btn-full" type="button">Add a goal</button>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Transactions -->
+    <section class="section" id="transactions">
+      <div class="section-head">
+        <h2>Transactions</h2>
+        <p>Your recent activity will show here.</p>
+      </div>
+      <div class="panel">
+        <div class="table">
+          <div class="table-head">
+            <div>Date</div>
+            <div>Description</div>
+            <div>Category</div>
+            <div class="right">Amount</div>
+          </div>
+
+          {% if transactions|length == 0 %}
+            <div class="table-row">
+              <div class="muted">—</div>
+              <div class="muted">No transactions yet</div>
+              <div class="muted">—</div>
+              <div class="right muted">$0</div>
+            </div>
+          {% else %}
+            {% for t in transactions %}
+              <div class="table-row">
+                <div class="muted">{{ t["tx_date"] }}</div>
+                <div>{{ t["description"] }}</div>
+                <div class="muted">{{ t["category"] }}</div>
+                <div class="right {% if t['tx_type'] == 'expense' %}expense-amt{% else %}income-amt{% endif %}">
+                  {% if t["tx_type"] == "expense" %}−{% else %}+{% endif %}
+                  ${{ "%.2f"|format(t["amount_cents"]/100) }}
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-copy">© <span id="year"></span> Vaquero Student Finance Helper</div>
+    <div class="footer-links">
+      <a href="#learn">Learn</a>
+      <a href="#budget">Budget</a>
+      <a href="#transactions">Transactions</a>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
